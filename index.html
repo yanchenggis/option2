@@ -311,7 +311,14 @@
                 el.onclick = function(e) {
                     e.stopPropagation();
                     clearTimeout(hideTimeout);
-                    popup.addTo(urbanMapInstance);
+                    if (popup.isOpen()) {
+                        popup.remove();
+                    } else {
+                        popup.addTo(urbanMapInstance);
+                        hideTimeout = setTimeout(() => {
+                            popup.remove();
+                        }, 3000);
+                    }
                 };
             });
 
