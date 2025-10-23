@@ -271,6 +271,7 @@
                 el.style.border = '3px solid #21C875';
                 el.style.cursor = 'pointer';
                 el.style.boxShadow = '0 0 10px rgba(15,93,244,0.8)';
+                el.style.pointerEvents = 'auto';
 
                 const popupContent = `
                     <div class="popup-title">${point.name}</div>
@@ -285,31 +286,33 @@
                     closeButton: false,
                     closeOnClick: false,
                     maxWidth: 'none'
-                }).setHTML(popupContent);
+                });
+                
+                popup.setLngLat(point.coordinates);
+                popup.setHTML(popupContent);
 
-                new maplibregl.Marker(el)
+                const marker = new maplibregl.Marker({element: el})
                     .setLngLat(point.coordinates)
-                    .setPopup(popup)
                     .addTo(urbanMapInstance);
 
                 let hideTimeout;
 
-                el.addEventListener('mouseenter', () => {
+                el.onmouseenter = function() {
                     clearTimeout(hideTimeout);
                     popup.addTo(urbanMapInstance);
-                });
+                };
 
-                el.addEventListener('mouseleave', () => {
+                el.onmouseleave = function() {
                     hideTimeout = setTimeout(() => {
                         popup.remove();
                     }, 300);
-                });
+                };
 
-                el.addEventListener('click', (e) => {
+                el.onclick = function(e) {
                     e.stopPropagation();
                     clearTimeout(hideTimeout);
                     popup.addTo(urbanMapInstance);
-                });
+                };
             });
 
             let bearing = 0;
