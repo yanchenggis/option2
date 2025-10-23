@@ -32,19 +32,20 @@
 
         .hint-overlay {
             position: absolute;
-            top: 20px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
+            transform: translate(-50%, -50%);
+            background: rgba(33, 200, 117, 0.85);
             color: white;
-            padding: 12px 24px;
-            border-radius: 25px;
+            padding: 16px 32px;
+            border-radius: 30px;
             font-family: Arial, sans-serif;
-            font-size: 14px;
+            font-size: 20px;
+            font-weight: 500;
             z-index: 10;
             pointer-events: none;
             animation: fadeInOut 6s ease-in-out forwards;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            box-shadow: 0 6px 20px rgba(33, 200, 117, 0.6);
         }
 
         @keyframes fadeInOut {
@@ -95,21 +96,6 @@
             border-top-color: rgba(26, 26, 26, 0.85) !important;
         }
 
-        @keyframes blink {
-            0%, 100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.3;
-                transform: scale(1.2);
-            }
-        }
-
-        .marker-blink {
-            animation: blink 0.6s ease-in-out 3;
-        }
-
         @media (max-width: 768px) {
             .banner-container {
                 height: 50vh;
@@ -139,9 +125,8 @@
             }
 
             .hint-overlay {
-                font-size: 12px;
-                padding: 10px 20px;
-                top: 15px;
+                font-size: 16px;
+                padding: 14px 28px;
             }
         }
     </style>
@@ -230,7 +215,7 @@
                 label: "Art, culture & craft center",
                 description: "Cultural hub within the historic core of the city",
                 source: "Source: Think City (2023)",
-                sourceUrl: "https://thinkcity.com.my"
+                sourceUrl: "https://thinkcity.com.ly"
             },
             {
                 name: "Petaling Street",
@@ -277,8 +262,6 @@
                 }
             });
 
-            const markerElements = [];
-
             dataPoints.forEach((point) => {
                 const el = document.createElement('div');
                 el.style.width = '20px';
@@ -303,37 +286,35 @@
                     closeOnClick: false
                 }).setHTML(popupContent);
 
+                const marker = new maplibregl.Marker(el)
+                    .setLngLat(point.coordinates)
+                    .setPopup(popup)
+                    .addTo(urbanMapInstance);
+
                 let hoverTimeout;
 
                 el.addEventListener('mouseenter', () => {
                     hoverTimeout = setTimeout(() => {
-                        popup.addTo(urbanMapInstance);
-                        popup.setLngLat(point.coordinates);
+                        marker.togglePopup();
                     }, 300);
                 });
 
                 el.addEventListener('mouseleave', () => {
                     clearTimeout(hoverTimeout);
-                    popup.remove();
+                    if (popup.isOpen()) {
+                        marker.togglePopup();
+                    }
                 });
 
-                new maplibregl.Marker(el)
-                    .setLngLat(point.coordinates)
-                    .addTo(urbanMapInstance);
-
-                markerElements.push(el);
+                el.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (popup.isOpen()) {
+                        marker.togglePopup();
+                    } else {
+                        marker.togglePopup();
+                    }
+                });
             });
-
-            function randomBlink() {
-                const randomIndex = Math.floor(Math.random() * markerElements.length);
-                const marker = markerElements[randomIndex];
-                marker.classList.add('marker-blink');
-                setTimeout(() => {
-                    marker.classList.remove('marker-blink');
-                }, 1800);
-            }
-
-            setInterval(randomBlink, 3000);
 
             let bearing = 0;
             setInterval(() => {
