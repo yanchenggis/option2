@@ -138,17 +138,21 @@
     </div>
 
     <script>
+        const isMobile = window.innerWidth <= 768;
+
         const urbanMapInstance = new maplibregl.Map({
             container: 'urbanMap',
             style: 'https://tiles.openfreemap.org/styles/dark',
             center: [101.6941, 3.1500],
-            zoom: 14,
+            zoom: isMobile ? 13.5 : 14,
             pitch: 55,
             bearing: 0,
             maxBounds: [[101.680, 3.135], [101.715, 3.165]],
             touchPitch: true,
             touchZoomRotate: true,
-            dragRotate: true
+            dragRotate: true,
+            minZoom: isMobile ? 12 : 13,
+            maxZoom: 18
         });
 
         urbanMapInstance.addControl(new maplibregl.NavigationControl(), 'top-right');
@@ -296,20 +300,11 @@
                     .addTo(urbanMapInstance);
 
                 let hideTimeout;
+                let isTouch = false;
 
-                el.onmouseenter = function() {
-                    clearTimeout(hideTimeout);
-                    popup.addTo(urbanMapInstance);
-                };
-
-                el.onmouseleave = function() {
-                    hideTimeout = setTimeout(() => {
-                        popup.remove();
-                    }, 300);
-                };
-
-                el.onclick = function(e) {
-                    e.stopPropagation();
+                el.ontouchstart = function(e) {
+                    e.preventDefault();
+                    isTouch = true;
                     clearTimeout(hideTimeout);
                     if (popup.isOpen()) {
                         popup.remove();
@@ -318,6 +313,27 @@
                         hideTimeout = setTimeout(() => {
                             popup.remove();
                         }, 3000);
+                    }
+                };
+
+                el.onmouseenter = function() {
+                    if (!isTouch) {
+                        clearTimeout(hideTimeout);
+                        popup.addTo(urbanMapInstance);
+                    }
+                };
+
+                el.onmouseleave = function() {
+                    if (!isTouch) {
+                        hideTimeout = setTimeout(() => {
+                            popup.remove();
+                        }, 300);
+                    }
+                };
+
+                el.onclick = function(e) {
+                    if (!isTouch) {
+                        e.stopPropagation();
                     }
                 };
             });
