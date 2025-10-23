@@ -30,62 +30,84 @@
             height: 100%;
         }
 
-        .maplibregl-popup-content {
-            background: rgba(26, 26, 26, 0.95);
+        .hint-overlay {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
             color: white;
-            padding: 15px;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            z-index: 10;
+            pointer-events: none;
+            animation: fadeInOut 6s ease-in-out forwards;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .maplibregl-popup-content {
+            background: rgba(26, 26, 26, 0.85);
+            color: white;
+            padding: 12px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            min-width: 250px;
+            min-width: 220px;
         }
 
         .popup-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: #21C875;
-            margin-bottom: 10px;
-        }
-
-        .popup-metric {
-            font-size: 24px;
-            font-weight: bold;
-            color: #0F5DF4;
-            margin: 8px 0;
-        }
-
-        .popup-label {
-            font-size: 12px;
-            color: #aaa;
             margin-bottom: 8px;
         }
 
+        .popup-metric {
+            font-size: 22px;
+            font-weight: bold;
+            color: #0F5DF4;
+            margin: 6px 0;
+        }
+
+        .popup-label {
+            font-size: 11px;
+            color: #aaa;
+            margin-bottom: 6px;
+        }
+
         .popup-source {
-            font-size: 10px;
+            font-size: 9px;
             color: #666;
-            margin-top: 10px;
-            padding-top: 8px;
+            margin-top: 8px;
+            padding-top: 6px;
             border-top: 1px solid #333;
         }
 
         .maplibregl-popup-tip {
-            border-top-color: rgba(26, 26, 26, 0.95) !important;
+            border-top-color: rgba(26, 26, 26, 0.85) !important;
         }
 
-        /* Pulsing animation for markers */
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 10px rgba(15,93,244,0.8), 0 0 0 0 rgba(15,93,244,0.7);
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
             }
             50% {
-                box-shadow: 0 0 15px rgba(15,93,244,1), 0 0 0 8px rgba(15,93,244,0);
-            }
-            100% {
-                box-shadow: 0 0 10px rgba(15,93,244,0.8), 0 0 0 0 rgba(15,93,244,0);
+                opacity: 0.3;
+                transform: scale(1.2);
             }
         }
 
-        .marker-pulse {
-            animation: pulse 2s ease-in-out infinite;
+        .marker-blink {
+            animation: blink 0.6s ease-in-out 3;
         }
 
         @media (max-width: 768px) {
@@ -95,8 +117,31 @@
             }
             
             .maplibregl-popup-content {
-                min-width: 200px;
-                max-width: 250px;
+                min-width: 180px;
+                max-width: 220px;
+                padding: 10px;
+            }
+
+            .popup-title {
+                font-size: 14px;
+            }
+
+            .popup-metric {
+                font-size: 18px;
+            }
+
+            .popup-label {
+                font-size: 10px;
+            }
+
+            .popup-source {
+                font-size: 8px;
+            }
+
+            .hint-overlay {
+                font-size: 12px;
+                padding: 10px 20px;
+                top: 15px;
             }
         }
     </style>
@@ -104,6 +149,7 @@
 <body>
     <div class="banner-container">
         <div id="urbanMap"></div>
+        <div class="hint-overlay">Hover over markers to explore data</div>
     </div>
 
     <script>
@@ -231,9 +277,9 @@
                 }
             });
 
-            let firstPopup = null;
+            const markerElements = [];
 
-            dataPoints.forEach((point, index) => {
+            dataPoints.forEach((point) => {
                 const el = document.createElement('div');
                 el.style.width = '20px';
                 el.style.height = '20px';
@@ -241,7 +287,7 @@
                 el.style.background = '#0F5DF4';
                 el.style.border = '3px solid #21C875';
                 el.style.cursor = 'pointer';
-                el.className = 'marker-pulse';
+                el.style.boxShadow = '0 0 10px rgba(15,93,244,0.8)';
 
                 const popupContent = `
                     <div class="popup-title">${point.name}</div>
@@ -253,29 +299,41 @@
 
                 const popup = new maplibregl.Popup({
                     offset: 25,
-                    closeButton: true,
+                    closeButton: false,
                     closeOnClick: false
                 }).setHTML(popupContent);
 
-                const marker = new maplibregl.Marker(el)
+                let hoverTimeout;
+
+                el.addEventListener('mouseenter', () => {
+                    hoverTimeout = setTimeout(() => {
+                        popup.addTo(urbanMapInstance);
+                        popup.setLngLat(point.coordinates);
+                    }, 300);
+                });
+
+                el.addEventListener('mouseleave', () => {
+                    clearTimeout(hoverTimeout);
+                    popup.remove();
+                });
+
+                new maplibregl.Marker(el)
                     .setLngLat(point.coordinates)
-                    .setPopup(popup)
                     .addTo(urbanMapInstance);
 
-                // Auto-open the first marker's popup as a hint
-                if (index === 0) {
-                    firstPopup = popup;
-                    setTimeout(() => {
-                        marker.togglePopup();
-                        // Auto-close after 4 seconds to encourage exploration
-                        setTimeout(() => {
-                            if (popup.isOpen()) {
-                                popup.remove();
-                            }
-                        }, 4000);
-                    }, 1000);
-                }
+                markerElements.push(el);
             });
+
+            function randomBlink() {
+                const randomIndex = Math.floor(Math.random() * markerElements.length);
+                const marker = markerElements[randomIndex];
+                marker.classList.add('marker-blink');
+                setTimeout(() => {
+                    marker.classList.remove('marker-blink');
+                }, 1800);
+            }
+
+            setInterval(randomBlink, 3000);
 
             let bearing = 0;
             setInterval(() => {
