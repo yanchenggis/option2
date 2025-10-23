@@ -189,9 +189,8 @@
                 el.addEventListener('mouseenter', () => {
                     clearTimeout(hideTimeout);
                     popup.setLngLat(point.coordinates).addTo(urbanMapInstance);
-                    hideTimeout = setTimeout(() => popup.remove(), 300);
                 });
-
+                
                 el.addEventListener('mouseleave', () => {
                     hideTimeout = setTimeout(() => popup.remove(), 300);
                 });
