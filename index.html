@@ -288,30 +288,33 @@
 
                 const marker = new maplibregl.Marker(el)
                     .setLngLat(point.coordinates)
-                    .setPopup(popup)
                     .addTo(urbanMapInstance);
 
                 let hoverTimeout;
+                let hideTimeout;
 
                 el.addEventListener('mouseenter', () => {
-                    hoverTimeout = setTimeout(() => {
-                        marker.togglePopup();
-                    }, 300);
+                    clearTimeout(hideTimeout);
+                    if (!popup.isOpen()) {
+                        popup.setLngLat(point.coordinates).addTo(urbanMapInstance);
+                    }
                 });
 
                 el.addEventListener('mouseleave', () => {
-                    clearTimeout(hoverTimeout);
-                    if (popup.isOpen()) {
-                        marker.togglePopup();
-                    }
+                    hideTimeout = setTimeout(() => {
+                        popup.remove();
+                    }, 300);
                 });
 
                 el.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     if (popup.isOpen()) {
-                        marker.togglePopup();
+                        popup.remove();
                     } else {
-                        marker.togglePopup();
+                        popup.setLngLat(point.coordinates).addTo(urbanMapInstance);
+                        setTimeout(() => {
+                            popup.remove();
+                        }, 3000);
                     }
                 });
             });
