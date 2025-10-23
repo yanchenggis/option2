@@ -20,68 +20,68 @@
             overflow: hidden;
             background: linear-gradient(135deg, rgba(15,93,244,1) 19%, rgba(33,200,117,1) 89%);
         }
-        #urbanMap {
+        #map {
             position: absolute;
             top: 0;
             bottom: 0;
             width: 100%;
             height: 100%;
         }
-        .hint-overlay {
+        .content-overlay {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(33, 200, 117, 0.85);
+            top: 75%;
+            left: 50px;
+            transform: translateY(-50%);
             color: white;
-            padding: 16px 32px;
-            border-radius: 30px;
-            font-family: Arial, sans-serif;
-            font-size: 20px;
-            font-weight: 500;
             z-index: 10;
             pointer-events: none;
-            animation: fadeInOut 6s ease-in-out forwards;
-            box-shadow: 0 6px 20px rgba(33, 200, 117, 0.6);
         }
-        @keyframes fadeInOut {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { opacity: 0; }
+        .title {
+            font-size: 4em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 8px rgba(0,0,0,0.7), 1px 1px 3px rgba(0,0,0,0.9);
+            font-family: Arial, sans-serif;
+        }
+        .subtitle {
+            font-size: 1.5em;
+            opacity: 0.9;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.7), 1px 1px 3px rgba(0,0,0,0.9);
+            font-family: Arial, sans-serif;
         }
         .maplibregl-popup-content {
-            background: rgba(26, 26, 26, 0.85);
+            background: rgba(26, 26, 26, 0.95);
             color: white;
-            padding: 12px;
+            padding: 15px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            min-width: 220px;
+            min-width: 250px;
         }
-        .popup-title { font-size: 16px; font-weight: bold; color: #21C875; margin-bottom: 8px; }
-        .popup-metric { font-size: 22px; font-weight: bold; color: #0F5DF4; margin: 6px 0; }
-        .popup-label { font-size: 11px; color: #aaa; margin-bottom: 6px; }
-        .popup-source { font-size: 9px; color: #666; margin-top: 8px; padding-top: 6px; border-top: 1px solid #333; }
-        .maplibregl-popup-tip { border-top-color: rgba(26, 26, 26, 0.85) !important; }
+        .popup-title { font-size: 18px; font-weight: bold; color: #21C875; margin-bottom: 10px; }
+        .popup-metric { font-size: 24px; font-weight: bold; color: #0F5DF4; margin: 8px 0; }
+        .popup-label { font-size: 12px; color: #aaa; margin-bottom: 8px; }
+        .popup-source { font-size: 10px; color: #666; margin-top: 10px; padding-top: 8px; border-top: 1px solid #333; }
+        .maplibregl-popup-tip { border-top-color: rgba(26, 26, 26, 0.95) !important; }
         @media (max-width: 768px) {
             .banner-container { height: 50vh; min-height: 400px; }
-            .maplibregl-popup-content { min-width: 180px; max-width: 220px; padding: 10px; }
-            .popup-title { font-size: 14px; }
-            .popup-metric { font-size: 18px; }
-            .popup-label { font-size: 10px; }
-            .popup-source { font-size: 8px; }
-            .hint-overlay { font-size: 16px; padding: 14px 28px; }
+            .maplibregl-popup-content { min-width: 200px; max-width: 250px; }
+            .content-overlay { left: 30px; top: 80%; }
+            .title { font-size: 2.5em; }
+            .subtitle { font-size: 1.2em; }
         }
     </style>
 </head>
 <body>
     <div class="banner-container">
-        <div id="urbanMap"></div>
-        <div class="hint-overlay">Click markers to explore data</div>
+        <div id="map"></div>
+        <div class="content-overlay">
+            <div class="title">Urban Analytics</div>
+            <div class="subtitle">From Understanding Data to Developing Insights</div>
+        </div>
     </div>
     <script>
-        const urbanMapInstance = new maplibregl.Map({
-            container: 'urbanMap',
+        const map = new maplibregl.Map({
+            container: 'map',
             style: 'https://tiles.openfreemap.org/styles/dark',
             center: [101.6941, 3.1500],
             zoom: 14,
@@ -93,25 +93,22 @@
             dragRotate: true
         });
 
-        urbanMapInstance.addControl(new maplibregl.NavigationControl(), 'top-right');
+        map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
         const dataPoints = [
-            { name: "Masjid Jamek LRT Station", coordinates: [101.6945, 3.1502], metric: "~17,600", label: "Daily Ridership (2025)", description: "Major interchange station connecting Ampang/Sri Petaling, and Kelana Jaya Line.", source: "Source: Malaysia's official open data portal (2025)" },
-            { name: "Pasar Seni Station", coordinates: [101.6953, 3.1427], metric: "~13,700", label: "Daily Ridership (2025)", description: "Pasar Seni station served the LRT Kelana Jaya Line and the MRT Kajang Line.", source: "Source: Malaysia's official open data portal (2025)" },
-            { name: "Petaling Street (Chinatown)", coordinates: [101.6977, 3.1447], metric: "547", label: "Street Trading Activities", description: "Heritage bazaar and tourist hotspot", source: "Source: Malaysia Architectural Journal (2020)" },
-            { name: "Central Market", coordinates: [101.6965, 3.1456], metric: "42", label: "Cultural & Festival Events (Jan–Sep 2025)", description: "Art, craft, and cultural hub since 1888", source: "Source: Central Market (2025)" },
-            { name: "Jalan Tuanku Abdul Rahman", coordinates: [101.6965, 3.1594], metric: "278", label: "Fashion, Clothing, and Textiles entities", description: "One of the country's earliest shopping districts", source: "Source: Think City (2023)" },
-            { name: "Jalan Bukit Nanas", coordinates: [101.7007, 3.1510], metric: "12", label: "Education institutions along Jalan Bukit Nanas", description: "Education and Research", source: "Source: Think City (2023)" },
-            { name: "Heritage Triangle Precinct", coordinates: [101.6966, 3.1453], metric: "60", label: "Art, culture & craft center", description: "Cultural hub within the historic core of the city", source: "Source: Think City (2023)" },
-            { name: "Petaling Street", coordinates: [101.6985, 3.1438], metric: "115", label: "Restaurant/bar", description: "Mix of heritage hawker food and diverse foreign cuisines", source: "Source: Think City (2023)" },
-            { name: "Merdeka Square Precinct", coordinates: [101.6935, 3.1475], metric: "8.2 ha", label: "The Birthplace of Malaysia", description: "Historic civic square", source: "Source: Visit Kuala Lumpur" }
+            { name: "Masjid Jamek LRT Station", coordinates: [101.6945, 3.1502], metric: "~17,600", label: "Daily Ridership (2025)", description: "Major interchange station connecting Ampang/Sri Petaling, and Kelana Jaya Line.", source: "Source: Malaysia's official open data portal (2025)", sourceUrl: "https://data.gov.my/dashboard/rapid-explorer/rail/A0%3A%20All%20Stations/KJ13%3A%20Masjid%20Jamek" },
+            { name: "Pasar Seni Station", coordinates: [101.6953, 3.1427], metric: "~13,700", label: "Daily Ridership (2025)", description: "Pasar Seni station served the LRT Kelana Jaya Line and the MRT Kajang Line.", source: "Source: Malaysia's official open data portal (2025)", sourceUrl: "https://data.gov.my/dashboard/rapid-explorer/rail/A0%3A%20All%20Stations/KG16%3A%20Pasar%20Seni" },
+            { name: "Petaling Street (Chinatown)", coordinates: [101.6977, 3.1447], metric: "547", label: "Street Trading Activities", description: "Heritage bazaar and tourist hotspot", source: "Source: Malaysia Architectural Journal (2020)", sourceUrl: "https://www.majournal.my/index.php/maj/article/download/21/13/32" },
+            { name: "Central Market", coordinates: [101.6965, 3.1456], metric: "42", label: "Cultural & Festival Events (Jan–Sep 2025)", description: "Art, craft, and cultural hub since 1888", source: "Source: Central Market (2025)", sourceUrl: "https://centralmarket.com.my/events/" },
+            { name: "Jalan Tuanku Abdul Rahman", coordinates: [101.6965, 3.1594], metric: "278", label: "Fashion, Clothing, and Textiles entities", description: "One of the country's earliest shopping districts", source: "Source: Think City (2023)", sourceUrl: "https://thinkcity.com.my" },
+            { name: "Jalan Bukit Nanas", coordinates: [101.7007, 3.1510], metric: "12", label: "Education institutions along Jalan Bukit Nanas", description: "Education and Research", source: "Source: Think City (2023)", sourceUrl: "https://thinkcity.com.my" },
+            { name: "Heritage Triangle Precinct", coordinates: [101.6966, 3.1453], metric: "60", label: "Art, culture & craft center", description: "Cultural hub within the historic core of the city", source: "Source: Think City (2023)", sourceUrl: "https://thinkcity.com.my" },
+            { name: "Petaling Street", coordinates: [101.6985, 3.1438], metric: "115", label: "Restaurant/bar", description: "Mix of heritage hawker food and diverse foreign cuisines", source: "Source: Think City (2023)", sourceUrl: "https://thinkcity.com.my" },
+            { name: "Merdeka Square Precinct", coordinates: [101.6935, 3.1475], metric: "8.2 ha", label: "The Birthplace of Malaysia", description: "Historic civic square", source: "Source: Visit Kuala Lumpur", sourceUrl: "https://visitkualalumpur.com/" }
         ];
 
-        let lastPopup = null;
-        let lastTimeout = null;
-
-        urbanMapInstance.on('load', () => {
-            urbanMapInstance.addLayer({
+        map.on('load', () => {
+            map.addLayer({
                 'id': '3d-buildings',
                 'source': 'openmaptiles',
                 'source-layer': 'building',
@@ -129,7 +126,7 @@
                 }
             });
 
-            dataPoints.forEach((point) => {
+            dataPoints.forEach(point => {
                 const el = document.createElement('div');
                 el.style.width = '20px';
                 el.style.height = '20px';
@@ -153,46 +150,52 @@
                     closeOnClick: false
                 }).setHTML(popupContent);
 
-                new maplibregl.Marker(el).setLngLat(point.coordinates).addTo(urbanMapInstance);
+                const marker = new maplibregl.Marker(el).setLngLat(point.coordinates).addTo(map);
+
+                let hideTimeout = null;
+                let isOpen = false;
+
+                el.addEventListener('mouseenter', () => {
+                    if (hideTimeout) { clearTimeout(hideTimeout); hideTimeout = null; }
+                    popup.setLngLat(point.coordinates).addTo(map);
+                    isOpen = true;
+                });
+
+                el.addEventListener('mouseleave', () => {
+                    if (hideTimeout) { clearTimeout(hideTimeout); }
+                    hideTimeout = setTimeout(() => {
+                        try { popup.remove(); } catch(e){}
+                        isOpen = false;
+                    }, 300);
+                });
 
                 el.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (lastPopup && lastPopup !== popup) {
-                        try { lastPopup.remove(); } catch(e){ }
-                        if (lastTimeout) { clearTimeout(lastTimeout); lastTimeout = null; }
-                    }
-                    popup.setLngLat(point.coordinates).addTo(urbanMapInstance);
-                    lastPopup = popup;
-                    if (lastTimeout) { clearTimeout(lastTimeout); lastTimeout = null; }
-                    lastTimeout = setTimeout(() => {
-                        try { popup.remove(); } catch(e){ }
-                        lastPopup = null;
-                        lastTimeout = null;
+                    if (hideTimeout) { clearTimeout(hideTimeout); hideTimeout = null; }
+                    popup.setLngLat(point.coordinates).addTo(map);
+                    isOpen = true;
+                    hideTimeout = setTimeout(() => {
+                        try { popup.remove(); } catch(e){}
+                        isOpen = false;
                     }, 300);
                 });
 
                 el.addEventListener('touchstart', (e) => {
                     e.preventDefault();
-                    e.stopPropagation();
-                    if (lastPopup && lastPopup !== popup) {
-                        try { lastPopup.remove(); } catch(e){ }
-                        if (lastTimeout) { clearTimeout(lastTimeout); lastTimeout = null; }
-                    }
-                    popup.setLngLat(point.coordinates).addTo(urbanMapInstance);
-                    lastPopup = popup;
-                    if (lastTimeout) { clearTimeout(lastTimeout); lastTimeout = null; }
-                    lastTimeout = setTimeout(() => {
-                        try { popup.remove(); } catch(e){ }
-                        lastPopup = null;
-                        lastTimeout = null;
-                    }, 300);
+                    if (hideTimeout) { clearTimeout(hideTimeout); hideTimeout = null; }
+                    popup.setLngLat(point.coordinates).addTo(map);
+                    isOpen = true;
+                    hideTimeout = setTimeout(() => {
+                        try { popup.remove(); } catch(e){}
+                        isOpen = false;
+                    }, 3000);
                 });
             });
 
-            let bearing = 0;
+            let bearing = map.getBearing() || 0;
             function rotate() {
-                bearing = (bearing + 0.3) % 360;
-                urbanMapInstance.setBearing(bearing);
+                bearing = (bearing + 0.01) % 360;
+                map.setBearing(bearing);
                 requestAnimationFrame(rotate);
             }
             requestAnimationFrame(rotate);
