@@ -58,58 +58,26 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
             min-width: 220px;
         }
-        .popup-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #21C875;
-            margin-bottom: 8px;
-        }
-        .popup-metric {
-            font-size: 22px;
-            font-weight: bold;
-            color: #0F5DF4;
-            margin: 6px 0;
-        }
-        .popup-label {
-            font-size: 11px;
-            color: #aaa;
-            margin-bottom: 6px;
-        }
-        .popup-source {
-            font-size: 9px;
-            color: #666;
-            margin-top: 8px;
-            padding-top: 6px;
-            border-top: 1px solid #333;
-        }
-        .maplibregl-popup-tip {
-            border-top-color: rgba(26, 26, 26, 0.85) !important;
-        }
+        .popup-title { font-size: 16px; font-weight: bold; color: #21C875; margin-bottom: 8px; }
+        .popup-metric { font-size: 22px; font-weight: bold; color: #0F5DF4; margin: 6px 0; }
+        .popup-label { font-size: 11px; color: #aaa; margin-bottom: 6px; }
+        .popup-source { font-size: 9px; color: #666; margin-top: 8px; padding-top: 6px; border-top: 1px solid #333; }
+        .maplibregl-popup-tip { border-top-color: rgba(26, 26, 26, 0.85) !important; }
         @media (max-width: 768px) {
-            .banner-container {
-                height: 50vh;
-                min-height: 400px;
-            }
-            .maplibregl-popup-content {
-                min-width: 180px;
-                max-width: 220px;
-                padding: 10px;
-            }
+            .banner-container { height: 50vh; min-height: 400px; }
+            .maplibregl-popup-content { min-width: 180px; max-width: 220px; padding: 10px; }
             .popup-title { font-size: 14px; }
             .popup-metric { font-size: 18px; }
             .popup-label { font-size: 10px; }
             .popup-source { font-size: 8px; }
-            .hint-overlay {
-                font-size: 16px;
-                padding: 14px 28px;
-            }
+            .hint-overlay { font-size: 16px; padding: 14px 28px; }
         }
     </style>
 </head>
 <body>
     <div class="banner-container">
         <div id="urbanMap"></div>
-        <div class="hint-overlay">Hover over markers to explore data</div>
+        <div class="hint-overlay">Click markers to explore data</div>
     </div>
     <script>
         const urbanMapInstance = new maplibregl.Map({
@@ -138,6 +106,9 @@
             { name: "Petaling Street", coordinates: [101.6985, 3.1438], metric: "115", label: "Restaurant/bar", description: "Mix of heritage hawker food and diverse foreign cuisines", source: "Source: Think City (2023)" },
             { name: "Merdeka Square Precinct", coordinates: [101.6935, 3.1475], metric: "8.2 ha", label: "The Birthplace of Malaysia", description: "Historic civic square", source: "Source: Visit Kuala Lumpur" }
         ];
+
+        let lastPopup = null;
+        let lastTimeout = null;
 
         urbanMapInstance.on('load', () => {
             urbanMapInstance.addLayer({
@@ -182,31 +153,49 @@
                     closeOnClick: false
                 }).setHTML(popupContent);
 
-                const marker = new maplibregl.Marker(el).setLngLat(point.coordinates).addTo(urbanMapInstance);
+                new maplibregl.Marker(el).setLngLat(point.coordinates).addTo(urbanMapInstance);
 
-                let hideTimeout;
-
-                el.addEventListener('mouseenter', () => {
-                    clearTimeout(hideTimeout);
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (lastPopup && lastPopup !== popup) {
+                        try { lastPopup.remove(); } catch(e){ }
+                        if (lastTimeout) { clearTimeout(lastTimeout); lastTimeout = null; }
+                    }
                     popup.setLngLat(point.coordinates).addTo(urbanMapInstance);
-                });
-                
-                el.addEventListener('mouseleave', () => {
-                    hideTimeout = setTimeout(() => popup.remove(), 300);
+                    lastPopup = popup;
+                    if (lastTimeout) { clearTimeout(lastTimeout); lastTimeout = null; }
+                    lastTimeout = setTimeout(() => {
+                        try { popup.remove(); } catch(e){ }
+                        lastPopup = null;
+                        lastTimeout = null;
+                    }, 300);
                 });
 
                 el.addEventListener('touchstart', (e) => {
                     e.preventDefault();
+                    e.stopPropagation();
+                    if (lastPopup && lastPopup !== popup) {
+                        try { lastPopup.remove(); } catch(e){ }
+                        if (lastTimeout) { clearTimeout(lastTimeout); lastTimeout = null; }
+                    }
                     popup.setLngLat(point.coordinates).addTo(urbanMapInstance);
-                    setTimeout(() => popup.remove(), 3000);
+                    lastPopup = popup;
+                    if (lastTimeout) { clearTimeout(lastTimeout); lastTimeout = null; }
+                    lastTimeout = setTimeout(() => {
+                        try { popup.remove(); } catch(e){ }
+                        lastPopup = null;
+                        lastTimeout = null;
+                    }, 300);
                 });
             });
 
             let bearing = 0;
-            setInterval(() => {
+            function rotate() {
                 bearing = (bearing + 0.3) % 360;
                 urbanMapInstance.setBearing(bearing);
-            }, 100);
+                requestAnimationFrame(rotate);
+            }
+            requestAnimationFrame(rotate);
         });
     </script>
 </body>
