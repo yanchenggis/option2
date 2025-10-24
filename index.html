@@ -52,44 +52,34 @@
             maxZoom: 18,
             attributionControl: false
         });
-    
-        // Add attribution control in compact mode (collapsed)
-        const attrControl = new maplibregl.AttributionControl({
-            compact: true
-        });
+        
+        // Collapsed attribution control
+        const attrControl = new maplibregl.AttributionControl({ compact: true });
         urbanMapInstance.addControl(attrControl);
-    
-        // Force the attribution to remain collapsed on load
+        urbanMapInstance.addControl(new maplibregl.NavigationControl(), 'top-right');
+        
         urbanMapInstance.on('load', () => {
             const attrContainer = document.querySelector('.maplibregl-ctrl-attrib');
             if (attrContainer) {
                 attrContainer.classList.add('maplibregl-compact');
                 attrContainer.classList.remove('maplibregl-compact-show');
+                // Add toggle for click/tap
+                const infoButton = attrContainer.querySelector('.maplibregl-ctrl-attrib-button');
+                if (infoButton) {
+                    infoButton.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        attrContainer.classList.toggle('maplibregl-compact-show');
+                    });
+                }
             }
-        });
-    
-        urbanMapInstance.addControl(new maplibregl.NavigationControl(), 'top-right');
-    
-        const dataPoints = [
-            { name: "Masjid Jamek LRT Station", coordinates: [101.6945, 3.1502], metric: "~17,600", label: "Daily Ridership (2025)", description: "Major interchange station connecting Ampang/Sri Petaling, and Kelana Jaya Line.", source: "Source: Malaysia's official open data portal (2025)" },
-            { name: "Pasar Seni Station", coordinates: [101.6953, 3.1427], metric: "~13,700", label: "Daily Ridership (2025)", description: "Pasar Seni station served the LRT Kelana Jaya Line and the MRT Kajang Line.", source: "Source: Malaysia's official open data portal (2025)" },
-            { name: "Petaling Street (Chinatown)", coordinates: [101.6977, 3.1447], metric: "547", label: "Street Trading Activities", description: "Heritage bazaar and tourist hotspot", source: "Source: Malaysia Architectural Journal (2020)" },
-            { name: "Central Market", coordinates: [101.6965, 3.1456], metric: "42", label: "Cultural & Festival Events (Jan–Sep 2025)", description: "Art, craft, and cultural hub since 1888", source: "Source: Central Market (2025)" },
-            { name: "Jalan Tuanku Abdul Rahman", coordinates: [101.6965, 3.1594], metric: "278", label: "Fashion, Clothing, and Textiles entities", description: "One of the country's earliest shopping districts", source: "Source: Think City (2023)" },
-            { name: "Jalan Bukit Nanas", coordinates: [101.7007, 3.1510], metric: "12", label: "Education institutions along Jalan Bukit Nanas", description: "Education and Research", source: "Source: Think City (2023)" },
-            { name: "Heritage Triangle Precinct", coordinates: [101.6966, 3.1453], metric: "60", label: "Art, culture & craft center", description: "Cultural hub within the historic core of the city", source: "Source: Think City (2023)" },
-            { name: "Petaling Street", coordinates: [101.6985, 3.1438], metric: "115", label: "Restaurant/bar", description: "Mix of heritage hawker food and diverse foreign cuisines", source: "Source: Think City (2023)" },
-            { name: "Merdeka Square Precinct", coordinates: [101.6935, 3.1475], metric: "8.2 ha", label: "The Birthplace of Malaysia", description: "Historic civic square", source: "Source: Visit Kuala Lumpur" }
-        ];
-    
-        urbanMapInstance.on('load', () => {
+        
             urbanMapInstance.addLayer({
-                'id': '3d-buildings',
-                'source': 'openmaptiles',
+                id: '3d-buildings',
+                source: 'openmaptiles',
                 'source-layer': 'building',
-                'type': 'fill-extrusion',
-                'minzoom': 13,
-                'paint': {
+                type: 'fill-extrusion',
+                minzoom: 13,
+                paint: {
                     'fill-extrusion-color': [
                         'interpolate',
                         ['linear'],
@@ -106,7 +96,19 @@
                     'fill-extrusion-opacity': 0.9
                 }
             });
-    
+        
+            const dataPoints = [
+                { name: "Masjid Jamek LRT Station", coordinates: [101.6945, 3.1502], metric: "~17,600", label: "Daily Ridership (2025)", description: "Major interchange station connecting Ampang/Sri Petaling, and Kelana Jaya Line.", source: "Source: Malaysia's official open data portal (2025)" },
+                { name: "Pasar Seni Station", coordinates: [101.6953, 3.1427], metric: "~13,700", label: "Daily Ridership (2025)", description: "Pasar Seni station served the LRT Kelana Jaya Line and the MRT Kajang Line.", source: "Source: Malaysia's official open data portal (2025)" },
+                { name: "Petaling Street (Chinatown)", coordinates: [101.6977, 3.1447], metric: "547", label: "Street Trading Activities", description: "Heritage bazaar and tourist hotspot", source: "Source: Malaysia Architectural Journal (2020)" },
+                { name: "Central Market", coordinates: [101.6965, 3.1456], metric: "42", label: "Cultural & Festival Events (Jan–Sep 2025)", description: "Art, craft, and cultural hub since 1888", source: "Source: Central Market (2025)" },
+                { name: "Jalan Tuanku Abdul Rahman", coordinates: [101.6965, 3.1594], metric: "278", label: "Fashion, Clothing, and Textiles entities", description: "One of the country's earliest shopping districts", source: "Source: Think City (2023)" },
+                { name: "Jalan Bukit Nanas", coordinates: [101.7007, 3.1510], metric: "12", label: "Education institutions along Jalan Bukit Nanas", description: "Education and Research", source: "Source: Think City (2023)" },
+                { name: "Heritage Triangle Precinct", coordinates: [101.6966, 3.1453], metric: "60", label: "Art, culture & craft center", description: "Cultural hub within the historic core of the city", source: "Source: Think City (2023)" },
+                { name: "Petaling Street", coordinates: [101.6985, 3.1438], metric: "115", label: "Restaurant/bar", description: "Mix of heritage hawker food and diverse foreign cuisines", source: "Source: Think City (2023)" },
+                { name: "Merdeka Square Precinct", coordinates: [101.6935, 3.1475], metric: "8.2 ha", label: "The Birthplace of Malaysia", description: "Historic civic square", source: "Source: Visit Kuala Lumpur" }
+            ];
+        
             dataPoints.forEach((point) => {
                 const el = document.createElement('div');
                 el.style.width = '20px';
@@ -125,17 +127,36 @@
                     <div style="font-size: 13px; color: #ccc; margin-top: 8px;">${point.description}</div>
                     <div class="popup-source">${point.source}</div>
                 `);
+        
                 const marker = new maplibregl.Marker({ element: el })
                     .setLngLat(point.coordinates)
                     .addTo(urbanMapInstance);
-                let timeout;
-                el.onclick = () => {
+        
+                let hideTimeout;
+                let isTouch = false;
+        
+                el.ontouchstart = (e) => {
+                    e.preventDefault();
+                    isTouch = true;
+                    clearTimeout(hideTimeout);
                     popup.addTo(urbanMapInstance);
-                    clearTimeout(timeout);
-                    timeout = setTimeout(() => popup.remove(), 300);
+                    hideTimeout = setTimeout(() => popup.remove(), 1200);
+                };
+        
+                el.onmouseenter = () => {
+                    if (!isTouch) {
+                        clearTimeout(hideTimeout);
+                        popup.addTo(urbanMapInstance);
+                    }
+                };
+        
+                el.onmouseleave = () => {
+                    if (!isTouch) {
+                        hideTimeout = setTimeout(() => popup.remove(), 300);
+                    }
                 };
             });
-    
+        
             let bearing = 0;
             setInterval(() => {
                 bearing = (bearing + 0.3) % 360;
