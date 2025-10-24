@@ -148,7 +148,7 @@
             container: 'urbanMap',
             style: 'https://tiles.openfreemap.org/styles/dark',
             center: [101.6941, 3.1500],
-            zoom: isMobile ? 13.5 : 14,
+            zoom: isMobile ? 14 : 14,
             pitch: 55,
             bearing: 0,
             maxBounds: [[101.680, 3.135], [101.715, 3.165]],
@@ -192,11 +192,7 @@
                         300, '#6a6a6a',
                         450, '#757575'
                     ],
-                    'fill-extrusion-height': [
-                        'interpolate', ['linear'], ['zoom'],
-                        11, 0,
-                        12, ['get', 'render_height']
-                    ],
+                    'fill-extrusion-height': ['get', 'render_height'],
                     'fill-extrusion-base': ['get', 'render_min_height'],
                     'fill-extrusion-opacity': 0.9
                 }
