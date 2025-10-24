@@ -53,9 +53,7 @@
             attributionControl: false
         });
         
-        // Collapsed attribution control
-        const attrControl = new maplibregl.AttributionControl({ compact: true });
-        urbanMapInstance.addControl(attrControl);
+        urbanMapInstance.addControl(new maplibregl.AttributionControl({ compact: true }));
         urbanMapInstance.addControl(new maplibregl.NavigationControl(), 'top-right');
         
         urbanMapInstance.on('load', () => {
@@ -63,7 +61,6 @@
             if (attrContainer) {
                 attrContainer.classList.add('maplibregl-compact');
                 attrContainer.classList.remove('maplibregl-compact-show');
-                // Add toggle for click/tap
                 const infoButton = attrContainer.querySelector('.maplibregl-ctrl-attrib-button');
                 if (infoButton) {
                     infoButton.addEventListener('click', (e) => {
@@ -140,7 +137,7 @@
                     isTouch = true;
                     clearTimeout(hideTimeout);
                     popup.addTo(urbanMapInstance);
-                    hideTimeout = setTimeout(() => popup.remove(), 1200);
+                    hideTimeout = setTimeout(() => popup.remove(), 1500);
                 };
         
                 el.onmouseenter = () => {
