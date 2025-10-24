@@ -176,23 +176,31 @@
             { name: "Merdeka Square Precinct", coordinates: [101.6935, 3.1475], metric: "8.2 ha", label: "The Birthplace of Malaysia", description: "Historic civic square", source: "Source: Visit Kuala Lumpur" }
         ];
 
-        urbanMapInstance.on('load', () => {
-            urbanMapInstance.addLayer({
-                'id': '3d-buildings',
-                'source': 'openmaptiles',
-                'source-layer': 'building',
-                'type': 'fill-extrusion',
-                'minzoom': 13,
-                'paint': {
-                    'fill-extrusion-color': [
-                        'interpolate', ['linear'], ['get', 'render_height'],
-                        0, '#404040', 50, '#4a4a4a', 100, '#555555', 200, '#606060', 300, '#6a6a6a', 450, '#757575'
-                    ],
-                    'fill-extrusion-height': ['get', 'render_height'],
-                    'fill-extrusion-base': ['get', 'render_min_height'],
-                    'fill-extrusion-opacity': 0.9
-                }
-            });
+        urbanMapInstance.addLayer({
+            'id': '3d-buildings',
+            'source': 'openmaptiles',
+            'source-layer': 'building',
+            'type': 'fill-extrusion',
+            'minzoom': 11,  // previously 13
+            'paint': {
+                'fill-extrusion-color': [
+                    'interpolate', ['linear'], ['get', 'render_height'],
+                    0, '#404040',
+                    50, '#4a4a4a',
+                    100, '#555555',
+                    200, '#606060',
+                    300, '#6a6a6a',
+                    450, '#757575'
+                ],
+                'fill-extrusion-height': [
+                    'interpolate', ['linear'], ['zoom'],
+                    11, 0,
+                    12, ['get', 'render_height']
+                ],
+                'fill-extrusion-base': ['get', 'render_min_height'],
+                'fill-extrusion-opacity': 0.9
+            }
+        });
 
             dataPoints.forEach((point) => {
                 const el = document.createElement('div');
