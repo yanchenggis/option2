@@ -27,14 +27,28 @@
             width: 100%;
             height: 100%;
         }
+        /* --- Attribution styling fix for both desktop + mobile --- */
         .maplibregl-ctrl-attrib {
             background: rgba(0, 0, 0, 0.3) !important;
-            color: #fff !important;
-            border-radius: 6px;
-            padding: 2px 8px !important;
+            color: #ffffff !important;
+            border-radius: 6px !important;
+            padding: 3px 8px !important;
+            font-size: 10px !important;
         }
-        .maplibregl-ctrl-attrib a {
-            color: #21C875 !important;
+        .maplibregl-ctrl-attrib a,
+        .maplibregl-ctrl-attrib span {
+            color: #ffffff !important;
+            text-decoration: none !important;
+        }
+        .maplibregl-ctrl-attrib.maplibregl-compact-show {
+            background: rgba(0, 0, 0, 0.3) !important;
+        }
+        @media (max-width: 768px) {
+            .maplibregl-ctrl-attrib {
+                background: rgba(0, 0, 0, 0.3) !important;
+                color: #ffffff !important;
+                font-size: 9px !important;
+            }
         }
         .hint-overlay {
             position: absolute;
@@ -171,15 +185,8 @@
                 'minzoom': 13,
                 'paint': {
                     'fill-extrusion-color': [
-                        'interpolate',
-                        ['linear'],
-                        ['get', 'render_height'],
-                        0, '#404040',
-                        50, '#4a4a4a',
-                        100, '#555555',
-                        200, '#606060',
-                        300, '#6a6a6a',
-                        450, '#757575'
+                        'interpolate', ['linear'], ['get', 'render_height'],
+                        0, '#404040', 50, '#4a4a4a', 100, '#555555', 200, '#606060', 300, '#6a6a6a', 450, '#757575'
                     ],
                     'fill-extrusion-height': ['get', 'render_height'],
                     'fill-extrusion-base': ['get', 'render_min_height'],
