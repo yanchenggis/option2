@@ -49,6 +49,30 @@
                 font-size: 9px !important;
             }
         }
+        .title-overlay {
+            position: absolute;
+            bottom: 40px;
+            left: 50px;
+            text-align: left;
+            color: white;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0.85;
+        }
+        .title-overlay h1 {
+            margin: 0;
+            font-size: 64px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            text-shadow: 3px 3px 8px rgba(0,0,0,0.7), 1px 1px 3px rgba(0,0,0,0.9);
+        }
+        .title-overlay p {
+            margin: 15px 0 0 0;
+            font-size: 24px;
+            font-weight: normal;
+            font-family: Arial, sans-serif;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.7), 1px 1px 3px rgba(0,0,0,0.9);
+        }
         .hint-overlay {
             position: absolute;
             top: 50%;
@@ -112,6 +136,16 @@
                 height: 50vh;
                 min-height: 400px;
             }
+            .title-overlay {
+                bottom: 20px;
+                left: 30px;
+            }
+            .title-overlay h1 {
+                font-size: 40px;
+            }
+            .title-overlay p {
+                font-size: 19px;
+            }
             .maplibregl-popup-content {
                 min-width: 180px;
                 max-width: 220px;
@@ -140,6 +174,10 @@
     <div class="banner-container">
         <div id="urbanMap"></div>
         <div class="hint-overlay">Hover over markers to explore data</div>
+        <div class="title-overlay">
+            <h1>Urban Analytics</h1>
+            <p>From Understanding Data To Developing Insights</p>
+        </div>
     </div>
 
     <script>
@@ -152,16 +190,17 @@
             pitch: 55,
             bearing: 0,
             maxBounds: [[101.680, 3.135], [101.715, 3.165]],
-            touchPitch: true,
-            touchZoomRotate: true,
-            dragRotate: true,
+            touchPitch: false,
+            touchZoomRotate: false,
+            dragRotate: false,
+            scrollZoom: false,
+            doubleClickZoom: false,
             minZoom: isMobile ? 12 : 13,
             maxZoom: 18,
             attributionControl: false
         });
 
         urbanMapInstance.addControl(new maplibregl.AttributionControl({ compact: false }));
-        urbanMapInstance.addControl(new maplibregl.NavigationControl(), 'top-right');
 
         const dataPoints = [
             { name: "Masjid Jamek LRT Station", coordinates: [101.6945, 3.1502], metric: "~17,600", label: "Daily Ridership (2025)", description: "Major interchange station connecting Ampang/Sri Petaling, and Kelana Jaya Line.", source: "Source: Malaysia's official open data portal (2025)" },
