@@ -67,7 +67,7 @@
             text-shadow: 3px 3px 8px rgba(0,0,0,0.7), 1px 1px 3px rgba(0,0,0,0.9);
         }
         .title-overlay p {
-            margin: 8px 0 0 0;
+            margin: 5px 0 0 0;
             font-size: 24px;
             font-weight: normal;
             font-family: Arial, sans-serif;
@@ -95,6 +95,9 @@
             10% { opacity: 1; }
             90% { opacity: 1; }
             100% { opacity: 0; }
+        }
+        .maplibregl-popup {
+            z-index: 2000 !important;
         }
         .maplibregl-popup-content {
             background: rgba(26, 26, 26, 0.85);
@@ -151,9 +154,6 @@
                 max-width: 220px;
                 padding: 10px;
             }
-            .maplibregl-popup {
-               z-index: 2000 !important;
-           }
             .popup-title {
                 font-size: 14px;
             }
