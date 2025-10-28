@@ -250,7 +250,7 @@
                 el.style.boxShadow = '0 0 10px rgba(15,93,244,0.8)';
 
                 const popup = new maplibregl.Popup({
-                    offset: 25,
+                    offset: 35,
                     closeButton: false,
                     closeOnClick: false
                 });
@@ -276,15 +276,19 @@
                     isTouch = true;
                     clearTimeout(hideTimeout);
                     popup.addTo(urbanMapInstance);
-                    hideTimeout = setTimeout(() => popup.remove(), 1500);
+                    hideTimeout = setTimeout(() => popup.remove(), 5000);
                 };
                 el.onmouseenter = function() {
+                    el.style.background = '#21C875';
+                    el.style.border = '3px solid #0F5DF4';
                     if (!isTouch) {
                         clearTimeout(hideTimeout);
                         popup.addTo(urbanMapInstance);
                     }
                 };
                 el.onmouseleave = function() {
+                    el.style.background = '#0F5DF4';
+                    el.style.border = '3px solid #21C875';
                     if (!isTouch) {
                         hideTimeout = setTimeout(() => popup.remove(), 300);
                     }
