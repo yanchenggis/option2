@@ -274,9 +274,13 @@
                 el.ontouchstart = function(e) {
                     e.preventDefault();
                     isTouch = true;
+                    el.style.background = '#21C875';
+                    el.style.border = '3px solid #0F5DF4';
                     clearTimeout(hideTimeout);
                     popup.addTo(urbanMapInstance);
-                    hideTimeout = setTimeout(() => popup.remove(), 5000);
+                    hideTimeout = setTimeout(() => popup.remove(), 
+                        el.style.background = '#0F5DF4';
+                        el.style.border = '3px solid #21C875'; 5000);
                 };
                 el.onmouseenter = function() {
                     el.style.background = '#21C875';
